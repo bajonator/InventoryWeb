@@ -1,0 +1,60 @@
+﻿@model InventoryWeb.Core.ViewModels.UnitViewModel
+
+
+
+<div class="row">
+    <div class="col-md-8">
+        @await Html.PartialAsync("_UnitsTable", Model)
+    </div>
+    <div class="col-md-4 mt-3">
+        <h2 class="text-center">Dodaj jednostkę</h2>
+        @using (Html.BeginForm("AddUnit", "Unit"))
+        {
+            <div class=" text-center border rounded-2 border-dark">
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(x => x.Unit.Id)
+                <div class="form-group m-2">
+                    @Html.LabelFor(x => x.Unit.UnitName)
+                    @Html.TextBoxFor(x => x.Unit.UnitName, new { @class = "form-control", autofocus = "autofocus" })
+                    @Html.ValidationMessageFor(x => x.Unit.UnitName, "", new { @class = "text-danger" })
+                </div>
+                <div class="d-flex justify-content-center m-2">
+                    <button type="submit" class="btn btn-primary btn-lg">Zapisz</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+@section Scripts
+    {
+    <script type="text/javascript">
+        function deleteUnit(id, btn) {
+
+            if (!confirm("Czy na pewno chcesz usunąć jednostkę?"))
+                return;
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Delete", "Unit")",
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    if (data.success) {
+                        var row = btn.parentNode.parentNode;
+                        row.parentNode.removeChild(row);
+                    } else {
+                        alert(data.message);
+                    }
+                },
+                error: function (data) {
+                    alert(data.message)
+                },
+                dataType: "json"
+            });
+            return;
+        }
+    </script>
+}

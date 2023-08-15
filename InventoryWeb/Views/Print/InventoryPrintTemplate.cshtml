@@ -1,0 +1,62 @@
+﻿@model InventoryWeb.Core.ViewModels.InventoryViewModel
+
+@{
+    ViewBag.Title = "";
+    int i = 1;
+}
+
+<link rel="stylesheet" href="~/css/printInventory.css" />
+
+
+<div class="inventory-font">
+
+    <div class="row">
+        <div class="col-12 header-font">
+            <div>Spis Inwentaryzacji</div>
+            <div class="mt-1">@Model.Inventory.Name</div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between">
+        <div>
+            <div>Inwentaryzacje sporządzono w </div>
+            <div>@Model.Inventory.Company</div>
+        </div>
+        <div class="top-line">
+            <div class="top-small-caption">
+                <div>Wystawiono dnia @DateTime.Now.Date.ToShortDateString()</div>
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-bordered mt-5">
+        <thead>
+            <tr>
+                <th>Lp</th>
+                <th>Kod</th>
+                <th>Produkt</th>
+                <th>Ilość</th>
+                <th>Wartość</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var inv in Model.Products)
+            {
+                <tr>
+                    <td>@i</td>
+                    <td>@inv.Code</td>
+                    <td>@inv.ProductName</td>
+                    <td>@inv.Quantity</td>
+                    <td>@inv.Price zł</td>
+                </tr>
+                i++;
+            }
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-between">
+        <div>
+            <div>Całkowita wartość: </div>
+            <div>@Model.Inventory.Value</div>
+        </div>
+    </div>
+</div>
+

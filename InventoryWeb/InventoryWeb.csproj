@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>aspnet-InventoryWeb-ecc2adaf-2c0d-4403-8c72-a729ec6d6c55</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Persistence\Migrations\20230730150526_Init.cs" />
+    <Compile Remove="Persistence\Migrations\20230730150526_Init.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20230731172413_Inits.cs" />
+    <Compile Remove="Persistence\Migrations\20230731172413_Inits.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20230801044809_Init.cs" />
+    <Compile Remove="Persistence\Migrations\20230801044809_Init.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20230806050615_RequiredField.cs" />
+    <Compile Remove="Persistence\Migrations\20230806050615_RequiredField.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20230808160858_ChangePropertyProductName.cs" />
+    <Compile Remove="Persistence\Migrations\20230808160858_ChangePropertyProductName.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20230809134910_Init.cs" />
+    <Compile Remove="Persistence\Migrations\20230809134910_Init.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20230809142419_Inits.cs" />
+    <Compile Remove="Persistence\Migrations\20230809142419_Inits.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20230810140745_AddProductbasesTable.cs" />
+    <Compile Remove="Persistence\Migrations\20230810140745_AddProductbasesTable.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20230810153258_AddProductCollection.cs" />
+    <Compile Remove="Persistence\Migrations\20230810153258_AddProductCollection.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20230813115353_AddFieldCompany.cs" />
+    <Compile Remove="Persistence\Migrations\20230813115353_AddFieldCompany.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20230813120250_AddFieldCompanyRequired.cs" />
+    <Compile Remove="Persistence\Migrations\20230813120250_AddFieldCompanyRequired.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="bootstrap" Version="5.3.1" />
+    <PackageReference Include="bootstrap.sass" Version="5.3.1" />
+    <PackageReference Include="DinkToPdf" Version="1.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.32" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.32" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.32" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.32" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.32" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
+  </ItemGroup>
+
+</Project>

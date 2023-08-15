@@ -1,0 +1,123 @@
+﻿@using InventoryWeb.Core.Models;
+@using InventoryWeb.Core.Models.Domains;
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@model InventoryWeb.Core.ViewModels.InventoriesViewModel
+
+
+@if (User.Identity.Name != null)
+{
+    <!-- AddNewInventory -->
+    <div class="modal fade" id="AddModal" tabindex="-1" role="dialog" aria-labelledby="AddModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form id="saveFormInv" method="post" asp-controller="Inventory" asp-action="AddInentory">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Dodaj Inwentaryzacje</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="hidden" asp-for="Inventory.Id">
+                            <label asp-for="Inventory.Name" class="control-label" style="font-weight:bolder">Nazwa Inwentrayzacji:</label>
+                            <input asp-for="Inventory.Name" class="form-control" value="" />
+                            <span asp-validation-for="Inventory.Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" asp-for="Inventory.Id">
+                            <label asp-for="Inventory.Company" class="control-label" style="font-weight:bolder">Nazwa Firmy:</label>
+                            <input asp-for="Inventory.Company" class="form-control" value="" />
+                            <span asp-validation-for="Inventory.Company" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-Cancel" data-dismiss="modal">Anuluj</button>
+                        <button type="button" id="btnSaveInv" class="btn btn-primary">Zapisz</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Delete Inventory -->
+    <div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form id="deleteForm" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Usuń Inwentaryzacje</h5>
+                    </div>
+                    <div class="modal-body">
+                        <h1>Napewno Chcesz usunąć Inwentaryzacje?</h1>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                        <button type="button" class="btn btn-primary">Usuń</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @await Html.PartialAsync("_InventoryTable", Model.Inventories)
+}
+else
+{
+    <div class="d-flex justify-content-center">
+        <p class="alert-danger alert-light mt-4 mb-4"><strong>Dostęp tylko dla zalogowanych użytkowników!</strong></p>
+    </div>
+    <div class="d-flex justify-content-center border border-dark border-2 rounded-2">
+        <p class="m-2">
+            <strong>Aplikacja do tworzenia inwentaryzacji pozwala dodawac nowe inwentaryzacje i śledzić ich historie, oraz wyeksportowac plik PDF gotowy do wydruku.</strong>
+        </p>
+    </div>
+}
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            $("#btnSaveInv").click(function () {
+                var invForm = $("#saveFormInv").serialize();
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("AddInventory", "Inventory")',
+                    data: invForm,
+                    success: function () {
+                        window.location.href = "Inventory";
+                    }
+                })
+            })
+        })
+        function deleteInventory(id, btn) {
+            if (!confirm("Czy na pewno chcesz usunąć inwentaryzacje?"))
+                return;
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Delete", "Inventory")",
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    if (data.success) {
+                        var row = btn.parentNode.parentNode;
+                        row.parentNode.removeChild(row);
+
+                    } else {
+                        alert(data.message);
+                    }
+                },
+                error: function (data) {
+                    alert(data.message)
+                },
+                dataType: "json"
+            });
+        }
+        
+    </script>
+}

@@ -1,0 +1,62 @@
+﻿@model InventoryWeb.Core.ViewModels.InventoryViewModel
+
+<div id="productTable">
+    <div class="d-flex justify-content-between">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#AddProdModal" data-whatever="">Dodaj Produkt(y)</button>
+        <div>
+            <button class="btn btn-secondary" onclick="printInvoice()">Drukuj</button>
+            <button class="btn btn-secondary" onclick="generatePdf()">Generuj PDF</button>
+        </div>
+    </div>
+
+    <table class="table mt-3 table-bordered text-center">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Kod</th>
+                <th scope="col">Nazwa</th>
+                <th scope="col">Jednostka</th>
+                <th scope="col">Cena</th>
+                <th scope="col">Ilość</th>
+                <th scope="col">Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Products.Any())
+            {
+                foreach (var product in Model.Inventory.Products)
+                {
+                    <tr>
+                        <td>@product.Code</td>
+                        <td>@product.ProductName</td>
+                        <td>@product.Units.UnitName</td>
+                        <td>@product.Price</td>
+                        <td>@product.Quantity</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" data-toggle="modal" data-target="@("#EditProdModal-" + product.Id)" data-url="@Url.Action($"EditProduct/{product.Id}")">
+
+                                Edytuj
+                            </button>
+                            @await Html.PartialAsync("_EditProduct", product)
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="deleteProduct('@product.Id', this)">
+                                Usuń
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td class="text-center" colspan="6">
+                        Brak produktów do wyświetlenia!
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-end">
+        <div id="inventoryValue">Całkowita wartość: @Model.Inventory.Value zł</div>
+    </div>
+</div>

@@ -1,0 +1,240 @@
+﻿@model InventoryViewModel
+
+
+<!--Add Product-->
+<div class="modal fade" id="AddProdModal" tabindex="-1" role="dialog" aria-labelledby="AddProdModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="saveFormProd" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Inventory.Id">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Nowy Produkt</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-center">
+                        <label asp-for="Product.Code" class="control-label" style="color:darkred">Zeskanuj kod lub wpisz ręcznie</label>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Product.Code" class="control-label" style="font-weight:bolder">Kod:</label>
+                        <input asp-for="Product.Code" class="form-control" id="kodinput" />
+                        <span asp-validation-for="Product.Code" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Product.ProductName" class="control-label" style="font-weight:bolder">Nazwa produktu:</label>
+
+                        <div class="input-group">
+                            <input asp-for="Product.ProductName" class="form-control" id="nameinput"/>
+                            <div class="input-group-append" data-toggle="tooltip" data-placement="right" title="Dodaj do bazy produktów">
+                                <button class="btn btn-dark" id="addDb" type="button">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Product.ProductName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Product.UnitId" class="control-label" style="font-weight:bolder">Jednostka:</label>
+                        @Html.DropDownListFor(x => x.Product.UnitId,
+                        new SelectList(Model.Units, "Id", "UnitName"),
+                        "-- wybierz jednostkę --", new { @class = "form-control ", id="unitinput"} )
+                        @Html.ValidationMessageFor(x => x.Product.UnitId)
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Product.Quantity" class="control-label" style="font-weight:bolder">Ilość:</label>
+                        <input asp-for="Product.Quantity" class="form-control" id="quantityinput" />
+                        <span asp-validation-for="Product.Quantity" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Product.Price" class="control-label" style="font-weight:bolder">Cena:</label>
+                        <input asp-for="Product.Price" class="form-control" id="priceinput" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-Cancel" data-dismiss="modal">Zakończ</button>
+                    <button type="button" id="btnSaveProd" class="btn btn-primary">Zapisz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@await Html.PartialAsync("_ProductsTable", Model)
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+
+
+@section Scripts{
+
+    <script>
+
+        $('#AddProdModal').on('shown.bs.modal', function () {
+            $('#kodinput').focus();
+        });
+
+        var timerid;
+        $('#kodinput').on('input', function (e) {
+
+            clearTimeout(timerid);
+
+            var button = document.getElementById("addDb");
+            button.innerHTML = '<i class="bi bi-plus-lg"></i>';
+
+            timerid = setTimeout(function () {
+                var code = e.target.value;
+                $.ajax({
+                    type: "Get",
+                    url: '@Url.Action("FindProducts")',
+                    data: { kodinput: code },
+                    success: function (data) {
+                        if (data.productName) {
+                            $('#nameinput').val(data.productName);
+                            $('#unitinput').focus();
+                        }
+                        else {
+                            $('#nameinput').val("");
+                        }
+                    }
+                })
+            }, 550);
+        });
+
+        $("#btnSaveProd").click(function () {
+            var invForm = $("#saveFormProd").serialize();
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("AddProduct", "Inventory")',
+                data: invForm,
+                success: function (data) {
+                    calculateAndUpdateInventoryValue();
+                    $('#nameinput').val('');
+                    $('#kodinput').val('');
+                    $('#unitinput').val('');
+                    $('#quantityinput').val('0');
+                    $('#priceinput').val('0,00');
+                    $('#kodinput').focus();
+                    $("#productTable").html(data);
+                }
+            })
+        })
+
+        function deleteProduct(id, btn) {
+            if (!confirm("Czy na pewno chcesz usunąć produkt?"))
+                return;
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("DeleteProduct", "Inventory")",
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    if (data.success) {
+                        var row = btn.parentNode.parentNode;
+                        row.parentNode.removeChild(row);
+                        calculateAndUpdateInventoryValue();
+
+                    } else {
+                        alert(data.message);
+                    }
+                },
+                error: function (data) {
+                    alert(data.message)
+                },
+                dataType: "json"
+            });
+        }
+
+        function editProduct(productId) {
+            var invProd = $("#editForm-" + productId).serialize();
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("EditProduct", "Inventory")',
+                data: invProd,
+                success: function (data) {
+                    if (data.success) {
+                        $(".modal-backdrop").remove();
+                        $("#EditProdModal-" + productId).modal("hide").on("hidden.bs.modal", function () {
+                        });
+                        location.reload();
+                    } else {
+                        alert("Błąd podczas edycji produktu.");
+                    }
+                }
+            });
+        }
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+
+            $('[data-toggle="tooltip"]').on('click', function () {
+                $(this).tooltip('hide');
+            });
+        });
+
+
+        document.getElementById("addDb").addEventListener("click", function () {
+            var productDb = $("#saveFormProd").serialize();
+            var button = this;
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("AddProductDb", "Inventory")',
+                data: productDb,
+                success: function (data) {
+                    if(data.success)
+                    {
+                        button.innerHTML = '<i class="bi bi-check-lg"></i>';
+                    }
+                    else{
+                        alert("Pole kod i nazaw produktu są wymagane!")
+                    }
+                },
+            });
+        });
+
+        function generatePdf() {
+
+            $.ajax({
+                type: 'POST',
+                url: "@Url.Action("InventoryToPdf", "Print")",
+                data: {
+                    id: '@Model.Inventory.Id'
+                },
+                success: function (data) {
+                    window.location = '@Url.Action("DownloadInventoryPdf", "Print")' + '?fileGuid=' + data.FileGuid + '&fileName=' + data.FileName;
+                },
+                error: function (data) {
+                    alert(data.Message);
+                },
+                dataType: 'json',
+                cache: false
+            });
+        }
+
+        function printInvoice() {
+            var url = '@Url.Action("PrintInventory", "Print")' + '?id=' + '@Model.Inventory.Id';
+
+            var myWindow = window.open(url, '');
+
+            myWindow.onload = function () {
+                myWindow.print();
+                myWindow.onafterprint = function () {
+                    myWindow.close();
+                };
+            };
+        }
+        function calculateAndUpdateInventoryValue() {
+            var inventoryId = $("#Inventory_Id").val();
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("CalculateInventoryValue", "Inventory")' + '?inventoryId=' + inventoryId,
+                success: function (data) {
+                    var formattedInventoryValue = data.inventoryValue.toString().replace(".", ",");
+                    $("#inventoryValue").text("Całkowita wartość: " + formattedInventoryValue + " zł");
+                }
+            });
+        }
+    </script>
+}

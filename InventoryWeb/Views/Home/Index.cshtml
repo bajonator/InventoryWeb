@@ -1,0 +1,17 @@
+﻿
+@{
+    ViewData["Title"] = "Strona Główna";
+}
+
+@if (User.Identity.Name == null)
+{
+    <p class="alert-danger alert-light mt-4 mb-4"><strong>Dostęp tylko dla zalogowanych użytkowników!</strong></p>
+}
+else
+{
+    <p class="alert-danger alert-light mt-4 mb-4"><strong>Możesz w pełni korzystać z serwisu!</strong></p>
+    <p class="alert-danger alert-light mt-4 mb-4"><strong>Po kliknieciu w "Inwentaryzacja" bedziesz mogł utworzyć nowe wpisy</strong></p>
+}
+
+
+    
