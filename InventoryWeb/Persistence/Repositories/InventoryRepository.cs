@@ -1,4 +1,6 @@
-﻿using InventoryWeb.Core.Models.Domains;
+﻿using InventoryWeb.Core;
+using InventoryWeb.Core.Models.Domains;
+using InventoryWeb.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using System;
@@ -8,11 +10,11 @@ using System.Linq;
 
 namespace InventoryWeb.Persistence.Repositories
 {
-    public class InventoryRepository
+    public class InventoryRepository : IInventoryRepository
     {
-        private ApplicationDbContext _context;
+        private IApplicationDbContext _context;
 
-        public InventoryRepository(ApplicationDbContext context)
+        public InventoryRepository(IApplicationDbContext context)
         {
             _context = context;
         }
@@ -39,7 +41,6 @@ namespace InventoryWeb.Persistence.Repositories
         public void AddInventory(Inventory inventory)
         {
             _context.Inventories.Add(inventory);
-            _context.SaveChanges();
         }
 
         public Inventory GetPreview(int id)
@@ -51,13 +52,11 @@ namespace InventoryWeb.Persistence.Repositories
         {
             var inventory = _context.Inventories.Single(x => x.Id == id && x.UserId == userId);
             _context.Inventories.Remove(inventory);
-            _context.SaveChanges();
         }
 
         public void AddProduct(Product product)
         {
             _context.Products.Add(product);
-            _context.SaveChanges();
         }
 
         public Product GetProductById(int id)
@@ -69,38 +68,11 @@ namespace InventoryWeb.Persistence.Repositories
         {
             var product = _context.Products.Single(x => x.Id == id);
             _context.Products.Remove(product);
-            _context.SaveChanges();
         }
 
         public void Update(Product model)
         {
             _context.Products.Update(model);
-            _context.SaveChanges();
-        }
-
-        public IEnumerable<Unit> GetUnit()
-        {
-            return _context.Units.ToList();
-        }
-
-        public void AddProductDb(ProductsBase product)
-        {
-            var productFind = _context.ProductsBases.FirstOrDefault(x => x.Code == product.Code);
-            if (productFind == null) 
-            {
-                _context.ProductsBases.Add(product);
-                _context.SaveChanges();
-            }
-        }
-
-        public ProductsBase GetProductInBase(string kodinput)
-        {
-            return _context.ProductsBases.FirstOrDefault(x => x.Code == kodinput);
-        }
-
-        public IEnumerable<ProductsBase> GetProductsInBase()
-        {
-            return _context.ProductsBases.ToList();
         }
     }
 }

@@ -1,0 +1,148 @@
+﻿@model InventoryWeb.Core.ViewModels.ProductsDbViewModel
+
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-center mt-4">
+            <h2>Baza produktów</h2>
+        </div>
+
+        <div class="border border-dark col-md-12 rounded-2">
+            <div class="d-flex mt-3 justify-content-center">
+
+                <table class="table table-bordered text-center">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Kod</th>
+                            <th scope="col">Nazwa</th>
+                            <th scope="col">Cena</th>
+                            <th scope="col">Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.ProductsBase.Any())
+                        {
+                            foreach (var products in Model.ProductsBase)
+                            {
+                                <tr>
+                                    <td>
+                                        @products.Id
+                                    </td>
+                                    <td>
+                                        @products.Code
+                                    </td>
+                                    <td>
+                                        @products.NameProductDb
+                                    </td>
+                                    <td>
+                                        @products.EachPrice
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="@("#EditProdBaseModal-" + products.Id)" data-url="@Url.Action($"EditProductBase/{products.Id}")">
+                                            Edytuj
+                                            </button>
+                                        @await Html.PartialAsync("_EditProductBase", products)
+                                        <button class="btn btn-outline-danger btn-sm"
+                                                onclick="deleteProduct('@products.Id', this)">
+                                            Usuń
+                                        </button>
+
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td class="text-center" colspan="6">
+                                    Brak produktów!
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mt-4">
+        <div id="productFormContainer">
+            @await Html.PartialAsync("_AddProductBase", Model.ProductBase)
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+
+@section Scripts
+    {
+    <script type="text/javascript">
+
+        function deleteProduct(id, btn) {
+            if (!confirm("Czy na pewno chcesz usunąć jednostkę?"))
+                return;
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("DeleteProductDb", "ProductsBase")",
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    if (data.success) {
+                        var row = btn.parentNode.parentNode;
+                        row.parentNode.removeChild(row);
+                    } else {
+                        alert(data.message);
+                    }
+                },
+                error: function (data) {
+                    alert(data.message)
+                },
+                dataType: "json"
+            });
+            return;
+        }
+        function editProductDb(productId) {
+            var prodBase = $("#editForm-" + productId).serialize();
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("EditProductDb", "ProductsBase")',
+                data: prodBase,
+                success: function (data) {
+                    if (data.success) {
+                        $(".modal-backdrop").remove();
+                        $("#EditProdBaseModal-" + productId).modal("hide").on("hidden.bs.modal", function () {
+                        });
+                        location.reload();
+                    } else {
+                        alert("Błąd podczas edycji produktu.");
+                    }
+                }
+            });
+        }
+        document.getElementById("addDb").addEventListener("click", function () {
+            var productDb = $("#saveFormProd").serialize();
+            var button = this;
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("AddProductDb", "ProductsBase")',
+                data: productDb,
+                success: function (data) {
+                    if (data.success) {
+                        location.reload();
+                    }
+                    else {
+                        alert("Pole kod i nazwa produktu są wymagane!")
+                    }
+                },
+            });
+        });
+
+    </script>
+}

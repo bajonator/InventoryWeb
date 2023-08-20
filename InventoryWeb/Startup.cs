@@ -17,6 +17,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
+using InventoryWeb.Core.Service;
+using InventoryWeb.Persistence.Services;
+using InventoryWeb.Core;
 
 namespace InventoryWeb
 {
@@ -32,6 +35,12 @@ namespace InventoryWeb
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IInventoryService, InventoryService>();
+            services.AddScoped<IProductBaseService, ProductBaseService>();
+            services.AddScoped<IUnitService, UnitService>();
+            services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));

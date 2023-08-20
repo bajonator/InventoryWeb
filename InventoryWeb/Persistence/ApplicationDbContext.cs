@@ -1,4 +1,5 @@
-﻿using InventoryWeb.Core.Models.Domains;
+﻿using InventoryWeb.Core;
+using InventoryWeb.Core.Models.Domains;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace InventoryWeb.Persistence
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

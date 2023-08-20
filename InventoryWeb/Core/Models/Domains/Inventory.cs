@@ -14,11 +14,12 @@ namespace InventoryWeb.Core.Models.Domains
             Products = new Collection<Product>();
         }
         public int Id { get; set; }
-        [Required]
+        [Required(ErrorMessage = "To pole jest wymagane")]        
         public string Name { get; set; }
+
         public DateTime Date { get; set; }
         public string UserId { get; set; }
-        [Required]
+        [Required(ErrorMessage = "To pole jest wymagane")]
         public string Company { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Value { get; set; }

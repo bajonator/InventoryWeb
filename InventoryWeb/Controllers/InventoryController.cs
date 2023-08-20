@@ -1,8 +1,10 @@
 ﻿using InventoryWeb.Core.Models.Domains;
+using InventoryWeb.Core.Service;
 using InventoryWeb.Core.ViewModels;
 using InventoryWeb.Persistence;
 using InventoryWeb.Persistence.Extensions;
 using InventoryWeb.Persistence.Repositories;
+using InventoryWeb.Persistence.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +18,14 @@ namespace InventoryWeb.Controllers
 {
     public class InventoryController : Controller
     {
-        private InventoryRepository _inventoryRepository;
-        public InventoryController(ApplicationDbContext context)
+        private IUnitService _unitService;
+        private IInventoryService _inventoryService;
+        private IProductBaseService _productBaseService;
+        public InventoryController(IUnitService unitService, IInventoryService inventoryService, IProductBaseService productBaseService)
         {
-            _inventoryRepository = new InventoryRepository(context);
+            _unitService = unitService;
+            _inventoryService = inventoryService;
+            _productBaseService = productBaseService;
         }
         public IActionResult Inventory()
         {
@@ -27,37 +33,32 @@ namespace InventoryWeb.Controllers
 
             var vm = new InventoriesViewModel
             {
-                Inventory = _inventoryRepository.GetInventory(userId, 0),
-                Inventories = _inventoryRepository.Get(userId),
+                Inventory = _inventoryService.GetInventory(userId, 0),
+                Inventories = _inventoryService.Get(userId),
                 Product = new Product()
             };
             return View(vm);
         }
         public IActionResult InventoryPreview(int id)
         {
-            var inv = _inventoryRepository.GetPreview(id);
-            var products = _inventoryRepository.GetAllProducts(id);
+            var inv = _inventoryService.GetPreview(id);
+            var products = _inventoryService.GetAllProducts(id);
 
             var vm = new InventoryViewModel
             {
                 Inventory = inv,
-                Products = _inventoryRepository.GetProduct(inv.Id),
-                Units = _inventoryRepository.GetUnit(),
+                Products = _inventoryService.GetProduct(inv.Id),
+                Units = _unitService.GetUnit(),
                 Product = new Product()
             };
-            vm.Inventory.Value = GetValueAll(id);
+            vm.Inventory.Value = _inventoryService.GetValueAll(id);
 
             return View("InventoryPreview", vm);
         }
-        public IActionResult ProductsDb()
-        {
-            var products = _inventoryRepository.GetProductsInBase();
 
-            return View(products);
-        }
         public IActionResult GetInventoryProducts(int inventoryId)
         {
-            var products = _inventoryRepository.GetProduct(inventoryId);
+            var products = _inventoryService.GetProduct(inventoryId);
             var viewModel = new InventoryViewModel
             {
                 Products = products
@@ -66,12 +67,12 @@ namespace InventoryWeb.Controllers
         }
         public IActionResult FindProducts(string kodinput)
         {
-            var product = _inventoryRepository.GetProductInBase(kodinput);
+            var product = _productBaseService.GetProductBase(kodinput);
             if (product != null)
             {
                 var productName = product.NameProductDb;
-
-                return Json(new { success = true, productName });
+                var productPrice = product.EachPrice;
+                return Json(new { success = true, productName, productPrice });
             }
             return Json(new { success = false });
         }
@@ -89,12 +90,12 @@ namespace InventoryWeb.Controllers
                     Date = DateTime.Now,
                     UserId = User.GetUserId(),
                 };
-                _inventoryRepository.AddInventory(inventory);
+                _inventoryService.AddInventory(inventory);
+
                 return RedirectToAction("Inventory");
             }
             else
                 return View(inventory);
-
         }
         [HttpPost]
         public IActionResult AddProduct(InventoryViewModel model)
@@ -110,62 +111,30 @@ namespace InventoryWeb.Controllers
                 ProductValue = model.Product.Price * model.Product.Quantity,
             };
 
-            ModelState.Remove("Inventory.Name");
-            ModelState.Remove("Inventory.Company");
             if (!ModelState.IsValid)
             {
-                return PartialView("", product);
+                return View(product);
             }
-            _inventoryRepository.AddProduct(product);
+            _inventoryService.AddProduct(product);
 
-            return RedirectToAction("ProductTablePartial", new {id = model.Inventory.Id});
+            return RedirectToAction("ProductTablePartial", new { id = model.Inventory.Id });
         }
         public IActionResult ProductTablePartial(int id)
         {
             var products = new InventoryViewModel
             {
                 Inventory = new Inventory { Id = id },
-                Products = _inventoryRepository.GetAllProducts(id)
+                Products = _inventoryService.GetAllProducts(id)
             };
-            products.Inventory.Products = _inventoryRepository.GetAllProducts(id);
+            products.Inventory.Products = _inventoryService.GetAllProducts(id);
             return PartialView("_ProductsTable", products);
         }
         [HttpGet]
         public IActionResult CalculateInventoryValue(int inventoryId)
         {
-            var inventoryValue = GetValueAll(inventoryId);
+            var inventoryValue = _inventoryService.GetValueAll(inventoryId);
 
             return Json(new { inventoryValue });
-        }
-        private decimal GetValueAll(int id)
-        {
-            decimal val = 0;
-            var products = _inventoryRepository.GetAllProducts(id);
-            foreach (var item in products)
-            {
-                val += item.ProductValue;
-            };
-            return val;
-        }
-
-        [HttpPost]
-        public IActionResult AddProductDb(InventoryViewModel model, int inventoryId)
-        {
-            ModelState.Remove("Product.UnitId");
-            ModelState.Remove("Inventory.Name");
-            ModelState.Remove("Inventory.Company");
-            if (ModelState.IsValid)
-            {
-                var productDb = new ProductsBase
-                {
-                    NameProductDb = model.Product.ProductName,
-                    Code = model.Product.Code,
-                };
-
-                _inventoryRepository.AddProductDb(productDb);
-                return Json(new { success = true });
-            }
-            return Json(new { success = false });
         }
 
         [HttpPost]
@@ -174,8 +143,7 @@ namespace InventoryWeb.Controllers
             try
             {
                 var userId = User.GetUserId();
-                _inventoryRepository.Delete(id, userId);
-                
+                _inventoryService.Delete(id, userId);
             }
             catch (Exception ex)
             {
@@ -189,7 +157,7 @@ namespace InventoryWeb.Controllers
         {
             try
             {
-                _inventoryRepository.DeleteProduct(id);
+                _inventoryService.DeleteProduct(id);
             }
             catch (Exception ex)
             {
@@ -202,7 +170,7 @@ namespace InventoryWeb.Controllers
         [HttpPost]
         public IActionResult EditProduct(Product prodToUpdate)
         {
-            var updatedProduct = _inventoryRepository.GetProductById(prodToUpdate.Id);
+            var updatedProduct = _inventoryService.GetProductById(prodToUpdate.Id);
 
             updatedProduct.Code = prodToUpdate.Code;
             updatedProduct.ProductName = prodToUpdate.ProductName;
@@ -211,7 +179,7 @@ namespace InventoryWeb.Controllers
             updatedProduct.Quantity = prodToUpdate.Quantity;
             updatedProduct.ProductValue = prodToUpdate.Price * prodToUpdate.Quantity;
 
-            _inventoryRepository.Update(updatedProduct);
+            _inventoryService.Update(updatedProduct);
 
             return Json(new { success = true, updatedProduct });
         }

@@ -72,3 +72,8 @@ body {
 .clickable-icon {
     cursor: pointer;
 }
+#scanLabel {
+    transition: color 0.9s ease;
+    font-size: 20px;
+    font-weight: 500;
+}

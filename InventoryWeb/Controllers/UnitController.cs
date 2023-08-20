@@ -6,19 +6,21 @@ using InventoryWeb.Core.Models.Domains;
 using InventoryWeb.Core.ViewModels;
 using System;
 using Microsoft.EntityFrameworkCore;
+using InventoryWeb.Persistence.Services;
+using InventoryWeb.Core.Service;
 
 namespace InventoryWeb.Controllers
 {
     public class UnitController : Controller
     {
-        private UnitRepository _unitRepository;
-        public UnitController(ApplicationDbContext context)
+        private IUnitService _unitService;
+        public UnitController(IUnitService unitService)
         {
-            _unitRepository = new UnitRepository(context);
+            _unitService = unitService;
         }
         public IActionResult Units()
         {
-            var units = _unitRepository.GetUnits();
+            var units = _unitService.GetUnits();
             var vm = new UnitViewModel();
             vm.Units = units;
 
@@ -28,7 +30,7 @@ namespace InventoryWeb.Controllers
         {
             var vm = new UnitViewModel
             {
-                Units = _unitRepository.GetUnits()
+                Units = _unitService.GetUnits()
             };
             return View(vm);
         }
@@ -38,11 +40,10 @@ namespace InventoryWeb.Controllers
             try
             {
                 var userId = User.GetUserId();
-                _unitRepository.Delete(id);
+                _unitService.Delete(id);
             }
             catch (Exception ex)
             {
-                //logowanie
                 return Json(new { success = false, message = ex.Message });
             }
 
@@ -58,7 +59,7 @@ namespace InventoryWeb.Controllers
                 {
                     UnitName = unit.UnitName,
                 };
-                _unitRepository.Add(unit);
+                _unitService.Add(unit);
                 return RedirectToAction("Unit");
             }
             return RedirectToAction("Unit", unit);

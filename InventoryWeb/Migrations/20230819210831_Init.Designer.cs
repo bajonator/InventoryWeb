@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace InventoryWeb.Data.Migrations
+namespace InventoryWeb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230813190344_Inits")]
-    partial class Inits
+    [Migration("20230819210831_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -169,9 +169,14 @@ namespace InventoryWeb.Data.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("EachPrice")
+                        .HasColumnType("decimal(18, 2)");
+
                     b.Property<string>("NameProductDb")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

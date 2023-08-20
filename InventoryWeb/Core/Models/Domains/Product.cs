@@ -11,17 +11,17 @@ namespace InventoryWeb.Core.Models.Domains
     public class Product
     {
         public int Id { get; set; }
-        [Required(ErrorMessage ="Pole jest wymagane")]
+        [Required(ErrorMessage = "To pole jest wymagane")]
         public string Code { get; set; }
-        [Required(ErrorMessage = "Pole jest wymagane")]
+        [Required(ErrorMessage = "To pole jest wymagane")]
         public string ProductName { get; set; }
-        [Required(ErrorMessage = "Pole jest wymagane")]
+        [Required(ErrorMessage = "To pole jest wymagane")]
         [Display(Name = "Jednostka")]
         public int UnitId { get; set; }
-        [Required(ErrorMessage = "Pole jest wymagane")]
+        [Required(ErrorMessage = "To pole jest wymaganee")]
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Price { get; set; }
-        [Required(ErrorMessage = "Pole jest wymagane")]
+        [Required(ErrorMessage = "To pole jest wymagane")]
         [Column(TypeName = "decimal(18, 2)")]
         public decimal ProductValue { get; set; }
         public int Quantity { get; set; }

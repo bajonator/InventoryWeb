@@ -1,4 +1,6 @@
-﻿using InventoryWeb.Core.Models.Domains;
+﻿using InventoryWeb.Core;
+using InventoryWeb.Core.Models.Domains;
+using InventoryWeb.Core.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -6,14 +8,17 @@ using System.Linq;
 
 namespace InventoryWeb.Persistence.Repositories
 {
-    public class UnitRepository
+    public class UnitRepository : IUnitRepository
     {
-        private ApplicationDbContext _context;
-        public UnitRepository(ApplicationDbContext context)
+        private IApplicationDbContext _context;
+        public UnitRepository(IApplicationDbContext context)
         {
             _context = context;
         }
-
+        public IEnumerable<Unit> GetUnit()
+        {
+            return _context.Units.ToList();
+        }
         public IEnumerable<Unit> GetUnits()
         {
             return _context.Units.ToList();

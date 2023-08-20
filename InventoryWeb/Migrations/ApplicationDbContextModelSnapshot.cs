@@ -4,16 +4,14 @@ using InventoryWeb.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace InventoryWeb.Data.Migrations
+namespace InventoryWeb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230813153642_Init")]
-    partial class Init
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,6 +105,9 @@ namespace InventoryWeb.Data.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(18, 2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
@@ -134,6 +135,9 @@ namespace InventoryWeb.Data.Migrations
                     b.Property<string>("ProductName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("ProductValue")
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -163,9 +167,14 @@ namespace InventoryWeb.Data.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("EachPrice")
+                        .HasColumnType("decimal(18, 2)");
+
                     b.Property<string>("NameProductDb")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

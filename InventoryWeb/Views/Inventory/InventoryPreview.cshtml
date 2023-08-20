@@ -1,19 +1,23 @@
 ﻿@model InventoryViewModel
 
+@Html.AntiForgeryToken()
 
 <!--Add Product-->
 <div class="modal fade" id="AddProdModal" tabindex="-1" role="dialog" aria-labelledby="AddProdModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form id="saveFormProd" method="post">
+            <form id="saveFormProdBase" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Inventory.Id">
+                <input type="hidden" asp-for="Inventory.Company">
+                <input type="hidden" asp-for="Inventory.Name">
+                <input type="hidden" asp-for="Product.InventoryId">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Nowy Produkt</h5>
                 </div>
                 <div class="modal-body">
                     <div class="d-flex justify-content-center">
-                        <label asp-for="Product.Code" class="control-label" style="color:darkred">Zeskanuj kod lub wpisz ręcznie</label>
+                        <label id="scanLabel" asp-for="Product.Code" class="control-label" >Zeskanuj kod lub wpisz ręcznie</label>
                     </div>
                     <div class="form-group">
                         <label asp-for="Product.Code" class="control-label" style="font-weight:bolder">Kod:</label>
@@ -25,8 +29,8 @@
 
                         <div class="input-group">
                             <input asp-for="Product.ProductName" class="form-control" id="nameinput"/>
-                            <div class="input-group-append" data-toggle="tooltip" data-placement="right" title="Dodaj do bazy produktów">
-                                <button class="btn btn-dark" id="addDb" type="button">
+                            <div class="input-group-append" data-toggle="tooltip" data-placement="right" title="Dodaj do bazy produktów. Pole kod, nazwa produktu i cena będą zapisane.">
+                                <button class="btn btn-dark" id="addprodDb" type="button">
                                     <i class="bi bi-plus-lg"></i>
                                 </button>
                             </div>
@@ -52,7 +56,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-Cancel" data-dismiss="modal">Zakończ</button>
-                    <button type="button" id="btnSaveProd" class="btn btn-primary">Zapisz</button>
+                    <button type="button" id="btnSaveProd" class="btn btn-primary">Dodaj</button>
                 </div>
             </form>
         </div>
@@ -63,14 +67,14 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
-
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 
 @section Scripts{
 
     <script>
 
         $('#AddProdModal').on('shown.bs.modal', function () {
+            $('#priceinput').val('');
             $('#kodinput').focus();
         });
 
@@ -79,7 +83,7 @@
 
             clearTimeout(timerid);
 
-            var button = document.getElementById("addDb");
+            var button = document.getElementById("addprodDb");
             button.innerHTML = '<i class="bi bi-plus-lg"></i>';
 
             timerid = setTimeout(function () {
@@ -90,7 +94,9 @@
                     data: { kodinput: code },
                     success: function (data) {
                         if (data.productName) {
+                            var priceVal = data.productPrice.toString().replace(".", ",");
                             $('#nameinput').val(data.productName);
+                            $('#priceinput').val(priceVal)
                             $('#unitinput').focus();
                         }
                         else {
@@ -102,18 +108,18 @@
         });
 
         $("#btnSaveProd").click(function () {
-            var invForm = $("#saveFormProd").serialize();
+            var prodForm = $("#saveFormProdBase").serialize();
             $.ajax({
                 type: "POST",
                 url: '@Url.Action("AddProduct", "Inventory")',
-                data: invForm,
+                data: prodForm,
                 success: function (data) {
                     calculateAndUpdateInventoryValue();
                     $('#nameinput').val('');
                     $('#kodinput').val('');
                     $('#unitinput').val('');
                     $('#quantityinput').val('0');
-                    $('#priceinput').val('0,00');
+                    $('#priceinput').val('');
                     $('#kodinput').focus();
                     $("#productTable").html(data);
                 }
@@ -174,13 +180,13 @@
         });
 
 
-        document.getElementById("addDb").addEventListener("click", function () {
-            var productDb = $("#saveFormProd").serialize();
+        document.getElementById("addprodDb").addEventListener("click", function () {
+            var productDb = $("#saveFormProdBase").serialize();
             var button = this;
 
             $.ajax({
                 type: "POST",
-                url: '@Url.Action("AddProductDb", "Inventory")',
+                url: '@Url.Action("AddProductDbs", "ProductsBase")',
                 data: productDb,
                 success: function (data) {
                     if(data.success)
@@ -188,7 +194,7 @@
                         button.innerHTML = '<i class="bi bi-check-lg"></i>';
                     }
                     else{
-                        alert("Pole kod i nazaw produktu są wymagane!")
+                        alert("Pole kod i nazwa produktu są wymagane!")
                     }
                 },
             });
@@ -236,5 +242,17 @@
                 }
             });
         }
+
+        var colors = ["black", "red"];
+        var currentColorIndex = 0;
+
+        function toggleScanLabel() {
+            var scanLabel = document.getElementById("scanLabel");
+            scanLabel.style.color = colors[currentColorIndex];
+
+            currentColorIndex = (currentColorIndex + 1) % colors.length;
+        }
+
+        setInterval(toggleScanLabel, 750);
     </script>
 }
