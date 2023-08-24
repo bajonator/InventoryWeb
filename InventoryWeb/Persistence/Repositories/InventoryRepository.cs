@@ -21,7 +21,7 @@ namespace InventoryWeb.Persistence.Repositories
 
         public IEnumerable<Inventory> Get(string userId)
         {
-            return _context.Inventories.Include(x => x.Products).ToList();
+            return _context.Inventories.Include(x => x.Products).Where(x => x.UserId == userId).ToList();
         }
 
         public List<Product> GetAllProducts(int id)

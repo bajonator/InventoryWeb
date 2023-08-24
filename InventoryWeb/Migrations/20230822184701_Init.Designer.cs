@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventoryWeb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230819210831_Init")]
+    [Migration("20230822184701_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

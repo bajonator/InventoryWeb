@@ -98,6 +98,7 @@ namespace InventoryWeb.Controllers
                 return View(inventory);
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult AddProduct(InventoryViewModel model)
         {
             var product = new Product

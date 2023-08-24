@@ -38,6 +38,7 @@ namespace InventoryWeb.Controllers
                 EachPrice = model.Product.Price,
             };
             ModelState.Remove("Product.UnitId");
+            ModelState.Remove("Product.Quantity");
             if (!ModelState.IsValid)
             {
                 return Json(new { success = false, productDb });
@@ -46,23 +47,30 @@ namespace InventoryWeb.Controllers
             return Json(new { success = true, productDb });
         }
         [HttpPost]
-        public IActionResult AddProductDb(ProductsBase model)
+        public IActionResult AddProductDb(ProductsDbViewModel model)
         {
             var productDb = new ProductsBase
             {
-                NameProductDb = model.NameProductDb,
-                Code = model.Code,
-                EachPrice = model.EachPrice,
+                NameProductDb = model.ProductBase.NameProductDb,
+                Code = model.ProductBase.Code,
+                EachPrice = model.ProductBase.EachPrice,
             };
 
             if (!ModelState.IsValid)
             {
-                return Json(new { success = false, productDb });
+                return View(model);
             }
             _productBaseRepository.AddProductBase(productDb);
-            return Json(new {success = true, productDb});
+            return RedirectToAction("ProductBaseTablePartial");
         }
-
+        public IActionResult ProductBaseTablePartial()
+        {
+            var products = new ProductsDbViewModel
+            {
+                ProductsBase = _productBaseRepository.GetProductsInBase()
+            };
+            return PartialView("_ProductBaseTable", products);
+        }
         [HttpPost]
         public IActionResult DeleteProductDb(int id)
         {

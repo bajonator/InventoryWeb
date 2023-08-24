@@ -1,58 +1,51 @@
 ﻿@model InventoryWeb.Core.ViewModels.UnitViewModel
 
-@{
-    ViewData["Title"] = "Jednostki";
-}
 
-<h1 class="mb-3 text-center" >Jednostki miary</h1>
-
-<div id="unitTable" class="border border-dark rounded-2">
-    <div class=" d-flex justify-content-center">
-        <table class="table mt-3 col-md-10 text-center table-bordered">
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">Id</th>
-                    <th scope="col">Nazwa</th>
-                    <th scope="col">Akcja</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model != null && Model.Units.Any())
-                {
-                    foreach (var unit in Model.Units)
-                    {
-                        <tr>
-                            <td>
-                                <div class="font-weight-bold">
-                                    @unit.Id
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="font-weight-bold">
-                                    @unit.UnitName
-                                </div>
-                            </td>
-
-                            <td>
-                                <button class="btn btn-danger btn-sm"
-                                        onclick="deleteUnit('@unit.Id', this)">
-                                    Usuń
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                }
-                else
+<div id="unitTable"">
+    <table class="table text-center ">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Nazwa</th>
+                <th scope="col">Akcja</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Units.Any())
+            {
+                foreach (var unit in Model.Units)
                 {
                     <tr>
-                        <td class="text-center" colspan="5">
-                            Brak jednostek!
+                        <td>
+                            <div class="font-weight-bold">
+                                @unit.Id
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="font-weight-bold">
+                                @unit.UnitName
+                            </div>
+                        </td>
+
+                        <td>
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="deleteUnit('@unit.Id', this)">
+                                Usuń
+                            </button>
                         </td>
                     </tr>
                 }
-            </tbody>
-        </table>
-    </div>
+            }
+            else
+            {
+                <tr>
+                    <td class="text-center" colspan="5">
+                        Brak jednostek!
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 

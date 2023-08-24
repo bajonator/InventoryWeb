@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20230819210831_Init.cs" />
+    <Compile Remove="Migrations\20230819210831_Init.Designer.cs" />
+    <Compile Remove="Migrations\20230822183747_2.cs" />
+    <Compile Remove="Migrations\20230822183747_2.Designer.cs" />
     <Compile Remove="Persistence\Migrations\00000000000000_CreateIdentitySchema.cs" />
     <Compile Remove="Persistence\Migrations\00000000000000_CreateIdentitySchema.Designer.cs" />
     <Compile Remove="Persistence\Migrations\20230730150526_Init.cs" />
@@ -53,6 +57,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Migrations\" />
     <Folder Include="Persistence\Migrations\" />
   </ItemGroup>
 

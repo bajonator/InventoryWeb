@@ -8,6 +8,8 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using InventoryWeb.Persistence.Services;
 using InventoryWeb.Core.Service;
+using InventoryWeb.Core.Repositories;
+using Newtonsoft.Json;
 
 namespace InventoryWeb.Controllers
 {
@@ -50,19 +52,29 @@ namespace InventoryWeb.Controllers
             return Json(new { success = true });
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult AddUnit(Unit unit)
         {
-            ModelState.Remove("unit.Id");
-            if (ModelState.IsValid)
+            unit = new Unit
             {
-                unit = new Unit
-                {
-                    UnitName = unit.UnitName,
-                };
-                _unitService.Add(unit);
-                return RedirectToAction("Unit");
+                UnitName = unit.UnitName,
+            };
+            ModelState.Remove("unit.Id");
+
+            if (!ModelState.IsValid)
+            {
+                return View(unit);
             }
-            return RedirectToAction("Unit", unit);
+            _unitService.Add(unit);
+            return RedirectToAction("UnitsTablePartial");
+        }
+        public IActionResult UnitsTablePartial()
+        {
+            var units = new UnitViewModel
+            {
+                Units = _unitService.GetUnits(),
+            };
+            return PartialView("_UnitsTable", units);
         }
     }
 }

@@ -10,7 +10,6 @@ namespace InventoryWeb.Core
         IUnitRepository Unit { get; }
         IProductBaseRepository ProductBase { get; }
 
-        void Complete();
-       
+        void Complete();       
     }
 }

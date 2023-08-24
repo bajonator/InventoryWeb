@@ -17,7 +17,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="d-flex justify-content-center">
-                        <label id="scanLabel" asp-for="Product.Code" class="control-label" >Zeskanuj kod lub wpisz ręcznie</label>
+                        <label id="scanLabel" asp-for="Product.Code" class="control-label">Zeskanuj kod lub wpisz ręcznie</label>
                     </div>
                     <div class="form-group">
                         <label asp-for="Product.Code" class="control-label" style="font-weight:bolder">Kod:</label>
@@ -28,7 +28,7 @@
                         <label asp-for="Product.ProductName" class="control-label" style="font-weight:bolder">Nazwa produktu:</label>
 
                         <div class="input-group">
-                            <input asp-for="Product.ProductName" class="form-control" id="nameinput"/>
+                            <input asp-for="Product.ProductName" class="form-control" id="nameinput" />
                             <div class="input-group-append" data-toggle="tooltip" data-placement="right" title="Dodaj do bazy produktów. Pole kod, nazwa produktu i cena będą zapisane.">
                                 <button class="btn btn-dark" id="addprodDb" type="button">
                                     <i class="bi bi-plus-lg"></i>
@@ -75,6 +75,7 @@
 
         $('#AddProdModal').on('shown.bs.modal', function () {
             $('#priceinput').val('');
+            $('#quantityinput').val('');
             $('#kodinput').focus();
         });
 
@@ -98,9 +99,11 @@
                             $('#nameinput').val(data.productName);
                             $('#priceinput').val(priceVal)
                             $('#unitinput').focus();
+                            button.innerHTML = '<i class="bi bi-check-lg"></i>';
                         }
                         else {
                             $('#nameinput').val("");
+                            $('#priceinput').val('');
                         }
                     }
                 })
@@ -118,10 +121,13 @@
                     $('#nameinput').val('');
                     $('#kodinput').val('');
                     $('#unitinput').val('');
-                    $('#quantityinput').val('0');
+                    $('#quantityinput').val('');
                     $('#priceinput').val('');
                     $('#kodinput').focus();
                     $("#productTable").html(data);
+                },
+                        error: function (data) {
+                    alert("Ne udało sie dodać produktu.\nSprawdź czy wszystkie pola sa wypełnione.");
                 }
             })
         })
@@ -189,11 +195,10 @@
                 url: '@Url.Action("AddProductDbs", "ProductsBase")',
                 data: productDb,
                 success: function (data) {
-                    if(data.success)
-                    {
+                    if (data.success) {
                         button.innerHTML = '<i class="bi bi-check-lg"></i>';
                     }
-                    else{
+                    else {
                         alert("Pole kod i nazwa produktu są wymagane!")
                     }
                 },

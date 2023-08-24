@@ -6,68 +6,41 @@
         <div class="d-flex justify-content-center mt-4">
             <h2>Baza produktów</h2>
         </div>
-
         <div class="border border-dark col-md-12 rounded-2">
-            <div class="d-flex mt-3 justify-content-center">
-
-                <table class="table table-bordered text-center">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Kod</th>
-                            <th scope="col">Nazwa</th>
-                            <th scope="col">Cena</th>
-                            <th scope="col">Akcje</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model != null && Model.ProductsBase.Any())
-                        {
-                            foreach (var products in Model.ProductsBase)
-                            {
-                                <tr>
-                                    <td>
-                                        @products.Id
-                                    </td>
-                                    <td>
-                                        @products.Code
-                                    </td>
-                                    <td>
-                                        @products.NameProductDb
-                                    </td>
-                                    <td>
-                                        @products.EachPrice
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="@("#EditProdBaseModal-" + products.Id)" data-url="@Url.Action($"EditProductBase/{products.Id}")">
-                                            Edytuj
-                                            </button>
-                                        @await Html.PartialAsync("_EditProductBase", products)
-                                        <button class="btn btn-outline-danger btn-sm"
-                                                onclick="deleteProduct('@products.Id', this)">
-                                            Usuń
-                                        </button>
-
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td class="text-center" colspan="6">
-                                    Brak produktów!
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+            <div class="mt-3">
+                    @await Html.PartialAsync("_ProductBaseTable")
             </div>
         </div>
     </div>
     <div class="col-md-4 mt-4">
         <div id="productFormContainer">
-            @await Html.PartialAsync("_AddProductBase", Model.ProductBase)
+            <h2 class="text-center">Dodaj Produkt</h2>
+            <form id="saveFormProdBase" method="post">
+                <div class=" text-center border rounded-2 border-dark">
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(x => x.ProductBase.Id)
+                    <div class="form-group m-2">
+                        <div class="d-flex justify-content-center">
+                            <label asp-for="ProductBase.Code" class="control-label" style="color:darkred">Zeskanuj kod lub wpisz ręcznie</label>
+                        </div>
+                        @Html.LabelFor(x => x.ProductBase.Code)
+                        @Html.TextBoxFor(x => x.ProductBase.Code, new { @class = "form-control", autofocus = "autofocus", id="kodinput", placeholder = "Wpisz kod produktu" })
+                        @Html.ValidationMessageFor(x => x.ProductBase.Code, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group m-2">
+                        @Html.LabelFor(x => x.ProductBase.NameProductDb)
+                        @Html.TextBoxFor(x => x.ProductBase.NameProductDb, new { @class = "form-control", autofocus = "autofocus", id="nameinput", placeholder = "Wpisz nazwę produktu" })
+                        @Html.ValidationMessageFor(x => x.ProductBase.NameProductDb, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group m-2">
+                        @Html.LabelFor(x => x.ProductBase.EachPrice)
+                        @Html.TextBoxFor(x => x.ProductBase.EachPrice, new { @class = "form-control", id="priceinput"})
+                    </div>
+                    <div class="d-flex justify-content-center m-2">
+                        <button type="button" id="addDb" class="btn btn-primary btn">Dodaj</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -125,24 +98,24 @@
                 }
             });
         }
-        document.getElementById("addDb").addEventListener("click", function () {
-            var productDb = $("#saveFormProd").serialize();
-            var button = this;
-
+        $("#addDb").click(function () {
+            var prodForm = $("#saveFormProdBase").serialize();
             $.ajax({
                 type: "POST",
                 url: '@Url.Action("AddProductDb", "ProductsBase")',
-                data: productDb,
+                data: prodForm,
                 success: function (data) {
-                    if (data.success) {
-                        location.reload();
-                    }
-                    else {
-                        alert("Pole kod i nazwa produktu są wymagane!")
-                    }
+                    $('#nameinput').val('');
+                    $('#kodinput').val('');
+                    $('#priceinput').val('0');
+                    $('#kodinput').focus();
+                    $("#productsBaseTable").html(data);
                 },
+                error: function (data) {
+                    alert("Ne udało sie dodać produktu.\nSprawdź czy pole kod i nazwa produktu są wypełnione.");
+                },
+                dataType: "html"
             });
         });
-
     </script>
 }

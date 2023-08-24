@@ -5,7 +5,7 @@
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#AddModal" data-whatever="">Nowa Inwentaryzacja </button>
     <a type="button" class="btn btn-secondary" asp-controller="Unit" asp-action="Unit">Jednostki</a>
     <a type="button" class="btn btn-secondary" asp-controller="ProductsBase" asp-action="ProductsDb">Baza Produktów</a>
-    <table class="table mt-3 table-bordered  text-center">
+    <table class="table mt-3  text-center">
         <thead class="thead-dark">
             <tr>
                 <th scope="col">Nazwa inwentarza</th>
@@ -34,7 +34,7 @@
                             @inventory.Date
                         </td>
                         <td>
-                            <button class="btn btn-outline-danger btn-sm"
+                            <button class="btn btn-danger btn-sm"
                                     onclick="deleteInventory('@inventory.Id', this)">
                                 Usuń
                             </button>
