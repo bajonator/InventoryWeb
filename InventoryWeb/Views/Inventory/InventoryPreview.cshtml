@@ -86,6 +86,12 @@
 
             var button = document.getElementById("addprodDb");
             button.innerHTML = '<i class="bi bi-plus-lg"></i>';
+            var code = e.target.value;
+            if (code === "") {
+                $('#scanLabel').show(); // Pokazanie etykiety
+            } else {
+                $('#scanLabel').hide(); // Ukrycie etykiety
+            }
 
             timerid = setTimeout(function () {
                 var code = e.target.value;
@@ -98,7 +104,7 @@
                             var priceVal = data.productPrice.toString().replace(".", ",");
                             $('#nameinput').val(data.productName);
                             $('#priceinput').val(priceVal)
-                            $('#unitinput').focus();
+                            $('#unitinput').focus();                         
                             button.innerHTML = '<i class="bi bi-check-lg"></i>';
                         }
                         else {
@@ -106,6 +112,7 @@
                             $('#priceinput').val('');
                         }
                     }
+
                 })
             }, 550);
         });
