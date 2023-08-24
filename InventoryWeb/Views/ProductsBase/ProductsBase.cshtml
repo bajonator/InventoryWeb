@@ -112,7 +112,14 @@
                     $("#productsBaseTable").html(data);
                 },
                 error: function (data) {
-                    alert("Ne udało sie dodać produktu.\nSprawdź czy pole kod i nazwa produktu są wypełnione.");
+                    $("#kodinput").addClass("shake");
+                    $("#nameinput").addClass("shake");
+
+                    setTimeout(function () {
+                        $("#kodinput").removeClass("shake");
+                        $("#nameinput").removeClass("shake");
+
+                    }, 1000);
                 },
                 dataType: "html"
             });

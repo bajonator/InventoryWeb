@@ -73,7 +73,11 @@
                     $("#unitTable").html(data);
                 },
                 error: function (data) {
-                    alert("Ne udało sie dodać jednostki.\nSprawdź czy pole nazwa jest wypełnione.");
+                    $("#nameinput").addClass("shake");
+
+                    setTimeout(function () {
+                        $("#nameinput").removeClass("shake");
+                    }, 1000);
                 },
                 dataType: "html"
             })

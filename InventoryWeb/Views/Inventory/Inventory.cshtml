@@ -92,7 +92,10 @@ else
                     data: invForm,
                     success: function () {
                         window.location.href = "Inventory";
-                    }
+                    },
+                    error: function (data) {
+                        alert("Ne udało sie dodać inwentaryzacji.\nSprawdź czy wszystkie pola sa wypełnione.");
+                    },
                 })
             })
         })
