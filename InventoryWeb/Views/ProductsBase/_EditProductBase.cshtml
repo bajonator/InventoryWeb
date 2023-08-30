@@ -10,18 +10,22 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label asp-for="Code" class="control-label" style="font-weight:bolder">Kod:</label>
-                        <input asp-for="Code" class="form-control" autofocus id="code" />
+                        <label asp-for="Code" class="control-label" style="font-weight:bolder">Kod:*</label>
+                        <input asp-for="Code" class="form-control" autofocus id="kod" />
                         <span asp-validation-for="Code" class="text-danger"></span>
 
-                        <label asp-for="NameProductDb" class="control-label" style="font-weight:bolder">Jednostka:</label>
+                        <label asp-for="NameProductDb" class="control-label" style="font-weight:bolder">Nazwa produktu:*</label>
                         <input asp-for="NameProductDb" class="form-control" id="name"/>
                         <span asp-validation-for="NameProductDb" class="text-danger"></span>
 
-                        <label asp-for="EachPrice" class="control-label" style="font-weight:bolder">Jednostka:</label>
-                        <input asp-for="EachPrice" class="form-control" id="price" />
+                        <label asp-for="EachPrice" class="control-label" style="font-weight:bolder">Cena za jednostkę:</label>
+                        <input asp-for="EachPrice" class="form-control" id="priceinput" />
                     </div>
+                    <label style="color:red">
+                        * - pola wymagane
+                    </label>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-Cancel" data-dismiss="modal">Anuluj</button>
                     <button type="button" class="btn btn-primary" onclick="editProductDb('@Model.Id')">Zapisz</button>

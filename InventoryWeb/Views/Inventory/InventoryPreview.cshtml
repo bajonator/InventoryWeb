@@ -119,6 +119,8 @@
 
         $("#btnSaveProd").click(function () {
             var prodForm = $("#saveFormProdBase").serialize();
+            var button = document.getElementById("addprodDb");
+
             $.ajax({
                 type: "POST",
                 url: '@Url.Action("AddProduct", "Inventory")',
@@ -131,6 +133,7 @@
                     $('#quantityinput').val('');
                     $('#priceinput').val('');
                     $('#kodinput').focus();
+                    button.innerHTML = '<i class="bi bi-plus-lg"></i>';
                     $("#productTable").html(data);
                 },
                         error: function (data) {
@@ -179,7 +182,7 @@
                         });
                         location.reload();
                     } else {
-                        alert("Błąd podczas edycji produktu.");
+                        alert("Błąd podczas edycji produktu.\nSprawdź czy wszystkie polą sa wypełnione");
                     }
                 }
             });

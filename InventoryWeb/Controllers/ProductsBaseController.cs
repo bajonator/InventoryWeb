@@ -29,13 +29,13 @@ namespace InventoryWeb.Controllers
             return View("ProductsBase", vm);
         }
         [HttpPost]
-        public IActionResult AddProductDbs(InventoryViewModel model)
+        public IActionResult AddProductDbs(ProductsBase model)
         {
             var productDb = new ProductsBase
             {
-                NameProductDb = model.Product.ProductName,
-                Code = model.Product.Code,
-                EachPrice = model.Product.Price,
+                NameProductDb = model.NameProductDb,
+                Code = model.Code,
+                EachPrice = model.EachPrice,
             };
             ModelState.Remove("Product.UnitId");
             ModelState.Remove("Product.Quantity");
@@ -44,7 +44,7 @@ namespace InventoryWeb.Controllers
                 return Json(new { success = false, productDb });
             }
             _productBaseRepository.AddProductBase(productDb);
-            return Json(new { success = true, productDb });
+            return RedirectToAction("ProductsDb");
         }
         [HttpPost]
         public IActionResult AddProductDb(ProductsDbViewModel model)
@@ -58,7 +58,7 @@ namespace InventoryWeb.Controllers
 
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View("ProductsBase", productDb);
             }
             _productBaseRepository.AddProductBase(productDb);
             return RedirectToAction("ProductBaseTablePartial");

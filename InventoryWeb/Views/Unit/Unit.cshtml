@@ -18,9 +18,10 @@
             <form id="saveFormUnit" method="post">
                 <div class=" text-center border rounded-2 border-dark">
                     @Html.AntiForgeryToken()
+                    @Html.ValidationSummary()
                     @Html.HiddenFor(x => x.Unit.Id)
                     <div class="form-group m-2">
-                        @Html.LabelFor(x => x.Unit.UnitName)
+                        @Html.LabelFor(x => x.Unit.UnitName) *
                         @Html.TextBoxFor(x => x.Unit.UnitName, new { @class = "form-control", autofocus = "autofocus", id="nameinput", placeholder = "Wpisz nazwę jednostki" })
                         @Html.ValidationMessageFor(x => x.Unit.UnitName, "", new { @class = "text-danger" })
                     </div>
@@ -28,6 +29,9 @@
                         <button type="button" id="addUnit" class="btn btn-primary">Dodaj</button>
                     </div>
                 </div>
+                <label style="color:red">
+                    * - pole wymagane
+                </label>
             </form>
         </div>
     </div>

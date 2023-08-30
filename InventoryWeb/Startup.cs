@@ -20,6 +20,10 @@ using System.IO;
 using InventoryWeb.Core.Service;
 using InventoryWeb.Persistence.Services;
 using InventoryWeb.Core;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
+using Microsoft.AspNetCore.Mvc;
+using InventoryWeb.ModelBinders;
 
 namespace InventoryWeb
 {
@@ -49,7 +53,17 @@ namespace InventoryWeb
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            services.Configure<MvcOptions>(options =>
+            {
+                var cultureInfo = new CultureInfo("pl-PL");
+                var decimalFormatter = new NumberFormatInfo
+                {
+                    NumberDecimalSeparator = ","
+                };
+                cultureInfo.NumberFormat = decimalFormatter;
 
+                options.ModelBinderProviders.Insert(0, new InvariantDecimalModelBinderProvider(cultureInfo));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -4,6 +4,7 @@ using InventoryWeb.Core.Service;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace InventoryWeb.Persistence.Services
 {
@@ -77,6 +78,7 @@ namespace InventoryWeb.Persistence.Services
         {
             decimal val = 0;
             var products = _unitOfWork.Inventory.GetAllProducts(id);
+            
             foreach (var item in products)
             {
                 val += item.ProductValue;

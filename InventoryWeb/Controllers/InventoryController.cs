@@ -1,4 +1,5 @@
 ﻿using InventoryWeb.Core.Models.Domains;
+using InventoryWeb.Core.Repositories;
 using InventoryWeb.Core.Service;
 using InventoryWeb.Core.ViewModels;
 using InventoryWeb.Persistence;
@@ -29,6 +30,7 @@ namespace InventoryWeb.Controllers
         }
         public IActionResult Inventory()
         {
+            
             var userId = User.GetUserId();
 
             var vm = new InventoriesViewModel
@@ -179,10 +181,14 @@ namespace InventoryWeb.Controllers
             updatedProduct.UnitId = prodToUpdate.UnitId;
             updatedProduct.Quantity = prodToUpdate.Quantity;
             updatedProduct.ProductValue = prodToUpdate.Price * prodToUpdate.Quantity;
+            if (ModelState.IsValid)
+            {
+                _inventoryService.Update(updatedProduct);
 
-            _inventoryService.Update(updatedProduct);
+                return Json(new { success = true });
+            }
 
-            return Json(new { success = true, updatedProduct });
+            return Json(new { success = false, updatedProduct });
         }
     }
 }

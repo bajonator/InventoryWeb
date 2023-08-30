@@ -7,6 +7,7 @@ namespace InventoryWeb.Core.Models.Domains
     {
         public int Id { get; set; }
         [Display(Name = "Nazwa jednostki")]
+        [Required(ErrorMessage ="Pole jest wymagane")]
         public string UnitName { get; set; }
     }
 }
